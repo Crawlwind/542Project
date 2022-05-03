@@ -1,0 +1,55 @@
+---
+title: "Kmeans"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+  library(vcd)
+  library(readr)
+  library(factoextra)
+  library(cluster)
+  
+  train<-read.csv("fashion-mnist_train.csv")
+  test <- read.csv("fashion-mnist_test.csv")
+  dim(train)
+```
+```{r}
+  table(train[,1])
+  table(test[,1])
+```
+- K-Means
+```{r}
+  set.seed(1)
+
+  train_data<- train[,-1]
+  
+  random_row_no <- sample(nrow(train_data),8000)
+  random_data <- train_data[random_row_no,]
+  fviz_nbclust(random_data, kmeans, method = "wss")
+```
+
+```{r}
+  cl<-kmeans(train[,-1], centers = 10, nstart = 10, iter.max = 50)
+```
+
+```{r}
+  cl.size = cl$size
+  cl.center = cl$centers
+  cbind(cl.size,sum(cl.size))
+```
+- Data visualzation
+```{r}
+  fviz_cluster(cl, data = train[,-1])
+```
+
+```{r}
+  df<-data.frame(predicted = cl$cluster, actual = train$label)
+  tb<-table(pred=df$predicted,actual=df$actual)
+  assoc(tb, shade = T, labeling = labeling_values)
+```
